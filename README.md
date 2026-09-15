@@ -13,6 +13,7 @@ npx skills add ohtaman/hpc-skills --skill tsubame4
 | `tsubame4` | TSUBAME4.0 (東京科学大学) | 汎用リファレンス |
 | `tsubame4-minicamp` | TSUBAME4.0 ミニキャンプイベント | イベント固有の差分設定 |
 | `sakuracloud` | さくらのクラウド / 高火力（さくらインターネット） | 汎用リファレンス |
+| `abci` | ABCI 3.0 (産業技術総合研究所) | 汎用リファレンス |
 
 ## スキルの分け方
 

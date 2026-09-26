@@ -12,7 +12,7 @@ description: Wisteria/BDEC-01（東京大学情報基盤センターのスーパ
 | 用途 | シミュレーション（CPU） | データ・学習・解析（GPU） |
 | ノード | PRIMEHPC FX1000 × 7,680 | PRIMERGY GX2570 M6 × 45 |
 | CPU | **A64FX**（Arm / aarch64）48コア 2.2GHz | Xeon Platinum 8360Y (Ice Lake) 36コア × 2 |
-| メモリ | 32GiB（HBM2） | 512GiB |
+| メモリ | 32GiB | 512GiB |
 | GPU | なし | **NVIDIA A100 40GB × 8** |
 | ネットワーク | Tofu インターコネクト D | InfiniBand HDR 200Gbps × 4 |
 
@@ -141,7 +141,7 @@ python train.py
 
 cd $PJM_O_WORKDIR
 module load aquarius cuda
-torchrun --nproc_per_node=8 train.py
+torchrun --nproc_per_node=8 train.py   # 実行するコマンドは一例
 ```
 
 - share 系は `-L gpu=N`、ノード単位のグループ（`*-a`、`*-o`）は `-L node=N` で指定する
@@ -222,9 +222,9 @@ module load nvidia cuda ompi-cuda    # Aquarius: NVIDIA HPC SDK（nvc/nvfortran,
 module load singularity
 ```
 
-- Aquarius 向けの GPU コンパイル: `nvc -acc -gpu=cc80` / `nvcc -arch=sm_80`（A100 = cc80）
+- Aquarius 向けの OpenACC: `nvc -O3 -acc -Minfo=accel -gpu=cc80`（A100 = compute capability 8.0）
 - 入っているバージョンは時期によって変わるので `module avail` で確認する
-- Python は Miniconda / Archiconda のモジュールがある。Odyssey（aarch64）用と Aquarius（x86_64）用の環境は**別々に**作る
+- Python 環境として Miniconda / Archiconda が提供されている。Odyssey（aarch64）と Aquarius（x86_64）は CPU アーキテクチャが違うので、同じ環境は使い回せない
 
 ## ストレージ
 

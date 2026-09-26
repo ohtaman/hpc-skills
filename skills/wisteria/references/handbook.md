@@ -156,7 +156,7 @@ nvfortran -O3 -mp -acc -ta=tesla,cc80 -Minfo=accel -c main.f90
 nvfortran -acc -ta=tesla,managed ...                     # Unified Memory を使う
 ```
 
-講習会資料の 2023年2月時点のバージョン: NVIDIA HPC SDK 22.7、CUDA 11.4、ompi-cuda 4.1.4-11.4。
+講習会資料の 2023年2月時点のバージョン: `aquarius cuda ompi-cuda` は gcc 8.3.1 / CUDA 11.4 / OMPI-CUDA 4.1.1-11.4、`nvidia cuda ompi-cuda` は NVIDIA 22.7 / CUDA 11.4 / OMPI-CUDA 4.1.4-11.4。
 **古い情報**なので、実際に入っている版は `module avail` で確認する。
 
 Intel コンパイラのモジュール名は [未確認]（`module avail` で確認する）。
@@ -259,7 +259,7 @@ share                         **********************---   86%    55/  64
 
 ### インタラクティブジョブ
 
-[講習会] 第205回（講習会では `–g` の全角ダッシュが混じっているので、コピペするときは半角 `-g` に直す）
+[講習会] 第205回（講習会の PDF では `–g` `–L` にエンダッシュ `–` が使われているので、コピペするときは半角の `-` に直す）
 
 ```bash
 # Odyssey
@@ -273,7 +273,7 @@ pjsub --interact -g <グループ> -L rscgrp=interactive-a,elapse=00:10:00      
 
 - インタラクティブ用のノードがすべて使われていると、空くまでログインできない [講習会]
 - トークンを消費しない [公式] job.php
-- 経過時間の上限は下記「リソースグループ」表を参照。講習会の例（`elapse=01:00`）は上限を超えている可能性があるので、上限内の値にする
+- 経過時間の上限は下記「リソースグループ」表を参照
 
 ---
 
@@ -347,8 +347,16 @@ mpiexec -machinefile $PJM_O_NODEINF -n $PJM_MPI_PROC \
   -npernode 4 ./wrapper.sh ./a.out
 ```
 
-`wrapper.sh` は、各プロセスに別々の GPU を割り当てるために講習会で配布されたスクリプト
-（MPI のローカルランクから `CUDA_VISIBLE_DEVICES` を決める類のもの）。中身は講習会資料を参照。
+`wrapper.sh` は各ランクに別々の GPU を割り当てるスクリプト（`chmod +x` を忘れない）。講習会資料の例:
+
+```sh
+#!/bin/sh
+export LOCAL_RANK=$OMPI_COMM_WORLD_LOCAL_RANK
+export CUDA_VISIBLE_DEVICES=$LOCAL_RANK
+$*
+```
+
+講習会資料には、ランクごとに `UCX_NET_DEVICES`（`mlx5_0:1`〜`mlx5_3:1`）で InfiniBand のポートを使い分ける例もある。
 
 ### Aquarius: Singularity（1GPU）
 
@@ -422,7 +430,7 @@ interactive-o_n1 の制限時間は 2022-08-02 に見直されている。
 | | x-large-o | 1,153〜2,304 | 24時間 | 28GiB |
 | **priority-o** | — | 1〜288 | 48時間 | 28GiB |
 
-`priority-o` は優先利用ノード群（全体の約15%）で、消費係数が 1.50 になる。
+`priority-o` は優先利用ノード群（全体の15%程度）で、消費係数が 1.50 になる（[公式] token.php）。
 
 ### Aquarius（ノード単位、バッチ）
 
@@ -562,7 +570,7 @@ getfacl <ファイル名>     # 設定を確認する
 | Singularity のジョブが動かない | `#PJM -L jobenv=singularity` を付ける |
 | バッチジョブが投入できない | `show_token` でトークン残量を確認する |
 | 講習会のスクリプトをそのまま投入して失敗する | `lecture-o` / `gt00` は講習会専用。自分のリソースグループとグループに置き換える |
-| 講習会資料からコピーしたコマンドが失敗する | `–g`（全角ダッシュ）や `¥`（行継続）が混じっている。`-g`、`\` に直す |
+| 講習会資料からコピーしたコマンドが失敗する | `–g`（エンダッシュ）や `¥`（行継続）が混じっている。`-g`、`\` に直す |
 
 ---
 
